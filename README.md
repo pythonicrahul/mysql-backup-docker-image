@@ -38,8 +38,8 @@ services:
       - AWS_SECRET_KEY=your-aws-secret-key
       - S3_BUCKET_NAME=your-s3-bucket
     depends_on:
-	  -  mysql_container
+      - mysql_container
     networks:
-	  -  commong_network
+      - commong_network
     restart:  on-failure
 ```
