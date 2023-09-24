@@ -16,8 +16,7 @@ jobs:
       - name: Login to Container Registry
         run: echo ${{ secrets.CONTAINER_REGISTRY_PASSWORD }} | docker login ${{ secrets.CONTAINER_REGISTRY_URL }} -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t mysql-backup .
-
-      - name: Push Docker image
-        run: docker push ${{ secrets.CONTAINER_REGISTRY_URL }}/mysql-backup:latest
+      - name: Build and Push Docker image
+        run: | 
+          docker build -t ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest .
+          docker push ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest
