@@ -1,0 +1,23 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Container Registry
+        run: echo ${{ secrets.CONTAINER_REGISTRY_PASSWORD }} | docker login ${{ secrets.CONTAINER_REGISTRY_URL }} -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t mysql-backup .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.CONTAINER_REGISTRY_URL }}/mysql-backup:latest
