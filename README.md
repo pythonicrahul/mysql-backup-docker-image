@@ -3,6 +3,8 @@
 
 This script allows you to automatically back up your MySQL database and store the backups in an Amazon S3 bucket. You can use it in a Docker container and configure it to run backups on demand or on a schedule.
 
+**Docker Hub Repository:** [pythonicrahul/mysql-backup](https://hub.docker.com/r/pythonicrahul/mysql-backup)
+
 ## Getting Started
 
 Follow these steps to set up and use the MySQL Database Backup script.
@@ -26,7 +28,7 @@ Here's an example `docker-compose.yml` file:
 version: '3'
 services:
   mysql-backup:
-    image: [pythonicrahul/mysql-backup:latest](https://hub.docker.com/r/pythonicrahul/mysql-backup)
+    image: pythonicrahul/mysql-backup:latest
     environment:
       - NAME=YourProject
       - DB_HOST=your-mysql-host
@@ -40,6 +42,6 @@ services:
     depends_on:
       - mysql_container
     networks:
-      - commong_network
+      - common_network
     restart:  on-failure
 ```
