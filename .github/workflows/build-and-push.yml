@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Login to Container Registry
-        run: echo ${{ secrets.CONTAINER_REGISTRY_PASSWORD }} | docker login ${{ secrets.CONTAINER_REGISTRY_URL }} -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} --password-stdin
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.CONTAINER_REGISTRY_USERNAME }} -p ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Build and Push Docker image
-        run: | 
+        run: |
           docker build -t ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest .
           docker push ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest
