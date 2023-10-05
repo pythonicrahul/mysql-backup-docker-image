@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build:
@@ -18,5 +19,14 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          docker build -t ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest .
-          docker push ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest
+          # Determine the branch name
+          branch=${{ github.ref }}
+          if [[ "$branch" == "refs/heads/main" ]]; then
+            docker build -t ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest .
+            docker push ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:latest
+          elif [[ "$branch" == "refs/heads/dev" ]]; then
+            docker build -t ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:dev .
+            docker push ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/mysql-backup:dev
+          else
+            echo "Skipping Docker image build and push for branch: $branch"
+          fi

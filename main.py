@@ -3,6 +3,7 @@ import subprocess
 import boto3
 from datetime import datetime
 import time
+from colorama import Fore, Style
 
 # Get environment variables
 project_name = os.environ.get('NAME')
@@ -14,8 +15,13 @@ db_name = os.environ.get('DB_NAME')
 aws_access_key = os.environ.get('AWS_ACCESS_KEY')
 aws_secret_key = os.environ.get('AWS_SECRET_KEY')
 s3_bucket_name = os.environ.get('S3_BUCKET_NAME')
-restore_backup = os.environ.get('RESTORE_BACKUP')  # Get the restore flag
-backup_file_name = os.environ.get('BACKUP_FILE_NAME')  # Get the backup file name
+restore_backup = os.environ.get('RESTORE_BACKUP')
+backup_file_name = os.environ.get('BACKUP_FILE_NAME')
+
+
+def log(message, color=Fore.WHITE):
+    timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"{color}{timestamp} - {message}{Style.RESET_ALL}")
 
 
 def database_exists(database_name):
@@ -39,6 +45,8 @@ def restore_database(database_name, sql_backup_file):
         check=True,
     )
 
+
+log("MySQL Database Backup and Restore Script")
 if restore_backup.lower() == 'true':
     sql_backup_file = f"{backup_file_name}.sql"
 
@@ -48,9 +56,11 @@ if restore_backup.lower() == 'true':
 
     if not database_exists(db_name):
         restore_database(db_name, sql_backup_file)
-        print(f"{db_name} restored successfully.")
+        log(f"{db_name} restored successfully", Fore.GREEN)
+    else:
+        log(f"{db_name} already exists. Skipping restore.", Fore.YELLOW)
 
-max_attempts = 10 
+max_attempts = 10
 attempt = 0
 
 while attempt < max_attempts:
@@ -72,18 +82,17 @@ while attempt < max_attempts:
 
         # Upload the backup file to S3
         s3.upload_file(backup_filename, s3_bucket_name, backup_filename)
-        print(f"Backup successfully uploaded to S3: {backup_filename}")
+        log(f"Backup successfully uploaded to S3: {backup_filename}", Fore.GREEN)
 
         os.remove(backup_filename)
 
-        break  
+        break
 
     except subprocess.CalledProcessError:
         # MySQL is not yet available, wait and retry
         attempt += 1
-        print(
-            f"Attempt {attempt}/{max_attempts}: MySQL is not available. Retrying in 5 seconds...")
+        log(f"Attempt {attempt}/{max_attempts}: MySQL is not available. Retrying in 5 seconds...", Fore.YELLOW)
         time.sleep(5)
 
 if attempt >= max_attempts:
-    print("Max attempts reached. Backup process failed.")
+    log("Max attempts reached. Backup process failed.", Fore.RED)

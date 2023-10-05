@@ -13,6 +13,6 @@ COPY main.py .
 
 # Install any Python dependencies (if needed)
 RUN pip install boto3
-
+RUN pip install colorama
 # Specify the command to run when the container starts
 CMD ["python", "main.py"]
